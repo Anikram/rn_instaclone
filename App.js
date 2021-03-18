@@ -1,5 +1,6 @@
 import {StatusBar} from 'expo-status-bar';
 import React, {Component} from 'react';
+import Constants from "expo-constants";
 import {StyleSheet, Text, View} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -9,13 +10,13 @@ import {Provider} from 'react-redux';
 import store from './redux/store';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAQS1qAT4bHRtPj9NoN7F__NE4thrZXo28",
-  authDomain: "instaclone-a86b9.firebaseapp.com",
-  projectId: "instaclone-a86b9",
-  storageBucket: "instaclone-a86b9.appspot.com",
-  messagingSenderId: "598873086268",
-  appId: "1:598873086268:web:db291454ce8fcfb4d62639",
-  measurementId: "G-WW2NL065JB"
+  apiKey: Constants.manifest.apiKey,
+  authDomain: Constants.manifest.authDomain,
+  projectId: Constants.manifest.projectId,
+  storageBucket: Constants.manifest.storageBucket,
+  messagingSenderId: Constants.manifest.messagingSenderId,
+  appId: Constants.manifest.appId,
+  measurementId: Constants.manifest.measurementId,
 };
 
 if (firebase.apps.length === 0) {
