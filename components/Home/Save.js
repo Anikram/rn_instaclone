@@ -1,6 +1,9 @@
 import React, {useState} from 'react';
 import {View, StyleSheet, TextInput, Image, Button} from "react-native";
 import firebase from "firebase";
+import {bindActionCreators} from "redux";
+import {fetchUserPosts} from "../../redux/actions";
+import {connect} from "react-redux";
 require('firebase/firebase-storage')
 require('firebase/firestore')
 
@@ -51,6 +54,7 @@ const Save = ({navigation, ...props}) => {
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
         navigation.popToTop()
+        this.props.fetchUserPosts()
     })
   }
 
@@ -68,8 +72,9 @@ const Save = ({navigation, ...props}) => {
     </View>
   )
 }
+const mapDispatchToProps = (dispatch) => bindActionCreators({fetchUserPosts}, dispatch)
 
-export default Save;
+export default connect(null, mapDispatchToProps)(Save)
 
 const styles = StyleSheet.create({
   container: {

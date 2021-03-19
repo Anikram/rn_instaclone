@@ -1,26 +1,24 @@
 import React from 'react';
 import {View, Text, StyleSheet, Image, FlatList} from "react-native";
 import {connect} from 'react-redux';
+import {useEffect} from "react";
+import {bindActionCreators} from "redux";
+import {fetchUser, fetchUserPosts, loginUser, logoutUser} from "../../redux/actions";
 
-// const Post = ({url}) => (
-//   <View style={styles.post}>
-//     <Text style={styles.url}>{url}</Text>
-//   </View>
-// )
 const Post = ({url}) => (
-  <Image
-    source={{uri: url}}
-    style={styles.postImage}
-  />
+  <View style={styles.imageContainer}>
+    <Image
+      source={{uri: url}}
+      style={styles.postImage}
+    />
+  </View>
 )
 
 const Profile = ({user, posts}) => {
-
   const renderPost = ({item}) => (
     <Post url={item.url}/>
   )
 
-  console.log(posts)
   return (
     <View style={styles.container}>
       <View style={styles.infoContainer}>
@@ -48,7 +46,9 @@ const mapStateToProps = (store) => (
   }
 )
 
-export default connect(mapStateToProps, null)(Profile)
+const mapDispatchToProps = (dispatch) => bindActionCreators({fetchUserPosts}, dispatch)
+
+export default connect(mapStateToProps, mapDispatchToProps)(Profile)
 
 
 const styles = StyleSheet.create({
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   },
   image: {
     flex: 1,
-    aspectRatio: 3/2,
+    aspectRatio: 3 / 2,
   },
   text: {
     color: 'black',
@@ -78,9 +78,13 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     marginHorizontal: 16,
   },
+  imageContainer: {
+    flex: 1 / 3,
+  },
   postImage: {
-    width: '33%',
+    // width: '33%',
     // height: 1,
+    flex: 1,
     aspectRatio: 1
   },
   url: {
