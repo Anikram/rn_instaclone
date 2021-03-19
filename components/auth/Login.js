@@ -2,11 +2,13 @@ import React, {Component} from 'react';
 import {Text, View, StyleSheet, Button, TextInput} from 'react-native';
 
 import * as firebase from "firebase";
+import {bindActionCreators} from "redux";
+import {fetchUser, fetchUserPosts, loginUser, logoutUser} from "../../redux/actions";
+import {connect} from "react-redux";
 
-class Register extends Component {
+class Login extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       email: '',
       password: '',
@@ -19,7 +21,7 @@ class Register extends Component {
     const { email, password, name } = this.state;
     firebase.auth().signInWithEmailAndPassword(email, password)
       .then((result) => {
-        console.log(result)
+        this.props.fetchUser()
       })
       .catch(err => console.error(err))
   }
@@ -36,4 +38,10 @@ class Register extends Component {
   }
 }
 
-export default Register;
+const mapStateToProps = (store) => ({
+})
+
+const mapDispatchToProps = (dispatch) => bindActionCreators({loginUser,fetchUser}, dispatch)
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login);
+

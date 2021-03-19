@@ -2,12 +2,10 @@ import {StatusBar} from 'expo-status-bar';
 import React, {Component} from 'react';
 import Constants from "expo-constants";
 import {StyleSheet, Text, View} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import * as firebase from "firebase";
 import 'firebase/firestore';
-import {Provider} from 'react-redux';
-import store from './redux/store';
+
 
 const firebaseConfig = {
   apiKey: Constants.manifest.apiKey,
@@ -22,22 +20,28 @@ const firebaseConfig = {
 if (firebase.apps.length === 0) {
   firebase.initializeApp(firebaseConfig)
 }
-
-import LandingScreen from "./components/auth/Landing";
-import RegisterScreen from "./components/auth/Register";
-import LoginScreen from "./components/auth/Login";
-import HomeScreen from "./components/Home/Home";
-import AddScreen from './components/Home/Add';
-import SaveScreen from './components/Home/Save';
+// import {NavigationContainer} from '@react-navigation/native';
+// import {Provider} from 'react-redux';
+//
+import LoadedAppScreen from "./components/LoadedApp";
+import {bindActionCreators} from "redux";
+import {fetchUser, fetchUserPosts, loginUser, logoutUser} from "./redux/actions";
+import {connect, Provider} from "react-redux";
+import store from "./redux/store";
+// import LandingScreen from "./components/auth/Landing";
+// import RegisterScreen from "./components/auth/Register";
+// import LoginScreen from "./components/auth/Login";
+// import HomeScreen from "./components/Home/Home";
+// import AddScreen from './components/Home/Add';
+// import SaveScreen from './components/Home/Save';
 
 const Stack = createStackNavigator();
 
-export default class App extends Component {
+class App extends Component {
   constructor(props) {
     super(props);
     this.state = ({
       isLoaded: false,
-      loggedIn: false,
     })
   }
 
@@ -45,12 +49,10 @@ export default class App extends Component {
     firebase.auth().onAuthStateChanged((user) => {
       if (!user) {
         this.setState({
-          loggedIn: false,
           isLoaded: true,
         })
       } else {
         this.setState({
-          loggedIn: true,
           isLoaded: true,
         })
       }
@@ -59,6 +61,8 @@ export default class App extends Component {
 
   render() {
     const {loggedIn, isLoaded} = this.state;
+    console.log('loggedIn: ', loggedIn)
+    console.log('isLoaded: ', isLoaded)
     if (!isLoaded) {
       return (
         <View style={styles.container}>
@@ -66,30 +70,31 @@ export default class App extends Component {
         </View>
       )
     }
-    if (!loggedIn) {
-      return (
-        <NavigationContainer>
-          <Stack.Navigator initialRouteName={"Landing"}>
-            <Stack.Screen name={'Landing'} component={LandingScreen} options={{headerShown: false}}/>
-            <Stack.Screen name={'Register'} component={RegisterScreen}/>
-            <Stack.Screen name={'Login'} component={LoginScreen}/>
-          </Stack.Navigator>
-        </NavigationContainer>
-      );
-    }
     return (
       <Provider store={store}>
-        <NavigationContainer>
-          <Stack.Navigator initialRouteName="Home">
-            <Stack.Screen name='Home' component={HomeScreen} options={{headerShown: false}}/>
-            <Stack.Screen name='Add' component={AddScreen} options={{headerShown: true}} navigation={this.props.navigation}/>
-            <Stack.Screen name='Save' component={SaveScreen} options={{headerShown: true}} navigation={this.props.navigation}/>
-          </Stack.Navigator>
-        </NavigationContainer>
-      </Provider>
-    )
+        <LoadedAppScreen user={this.props.user}/>
+      </Provider>)
+
   }
 }
+
+const mapStateToProps = (store) => ({
+  user: store.userReducer.user
+})
+
+const mapDispatchToProps = (dispatch) => bindActionCreators({fetchUser, fetchUserPosts, logoutUser, loginUser}, dispatch)
+
+const AppContainer =  connect(mapStateToProps, mapDispatchToProps)(App);
+
+const InstaCloneApp = () => {
+  return (
+    <Provider store={store}>
+        <AppContainer store={store}/>
+    </Provider>
+  )
+}
+
+export default InstaCloneApp
 
 const styles = StyleSheet.create({
   container: {

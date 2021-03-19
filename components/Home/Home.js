@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Text, View, StyleSheet} from "react-native";
+import {Text, View, StyleSheet, Button} from "react-native";
 import {connect} from 'react-redux';
 import {bindActionCreators} from "redux";
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
@@ -15,7 +15,7 @@ import FeedScreen from '../Home/Feed';
 import ProfileScreen from '../Home/Profile';
 const EmptyScreen = () => null
 
-import {fetchUser} from "../../redux/actions";
+import {fetchUser, fetchUserPosts, logoutUser} from "../../redux/actions";
 
 class Home extends Component {
   constructor(props) {
@@ -27,17 +27,20 @@ class Home extends Component {
 
   componentDidMount() {
     this.props.fetchUser()
+    this.props.fetchUserPosts()
   }
 
   render() {
     const {user} = this.props;
-
     if (!user) {
-      return (
-        <View style={styles.container}>
-          <Text style={styles.text}>Loading . . .</Text>
-        </View>
-      );
+      return (<View style={styles.container}>
+        <Button title='Go back'
+          onPress={() => {
+            console.log(this.props)
+            this.props.navigation.navigate('Home', {screen: 'Login'})
+          }}
+        />
+      </View>);
     } else {
       return (
         <Tab.Navigator initialRouteName={'Feed'} labeled={false} >
@@ -68,6 +71,18 @@ class Home extends Component {
                           <MaterialCommunityIcons name='account-box' color={ICON_COLOR} size={ICON_SIZE}/>
                         )
                       }}/>
+          <Tab.Screen name="Logout"
+                      component={EmptyScreen}
+                      listeners={() => ({
+                        tabPress: () => {
+                          this.props.logoutUser()
+                        }
+                      })}
+                      options={{
+                        tabBarIcon: ({color, size}) => (
+                          <MaterialCommunityIcons name='door' color={ICON_COLOR} size={ICON_SIZE}/>
+                        )
+                      }}/>
         </Tab.Navigator>
       );
     }
@@ -75,9 +90,9 @@ class Home extends Component {
 }
 
 const mapStateToProps = (store) => ({
-  user: store.userReducer.user,
+  user: store.userReducer.user
 })
-const mapDispatchToProps = (dispatch) => bindActionCreators({fetchUser}, dispatch)
+const mapDispatchToProps = (dispatch) => bindActionCreators({fetchUser, fetchUserPosts, logoutUser}, dispatch)
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);
 
